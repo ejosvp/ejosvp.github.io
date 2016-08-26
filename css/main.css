@@ -1,0 +1,38 @@
+* {
+    font-family: 'Roboto', sans-serif;
+}
+
+body {
+    background-color: #fbfbfb;
+}
+
+pre, code {
+    font-family: 'Roboto Mono', monospace;
+}
+
+a {
+    color: #3b8bba;
+}
+
+.main {
+    max-width: 768px;
+    margin: 3em auto 0;
+}
+
+.left, .content {
+    padding: 1em;
+}
+
+.left {
+    text-align: center;
+}
+
+.content {
+}
+
+.avatar {
+    width: 150px;
+    height: 150px;
+    border-radius: 50% !important;
+    border: 2px dotted gray;
+}
