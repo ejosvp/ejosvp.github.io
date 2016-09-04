@@ -4,6 +4,8 @@ import Menu from './components/Menu';
 import PostList from './components/PostList';
 import * as api from './api/githubApi';
 
+const Remarkable = require('remarkable');
+
 class App extends React.Component {
   constructor() {
     super();
@@ -11,27 +13,31 @@ class App extends React.Component {
     this.state = ({
       posts: [],
     });
-    this.getPosts = this.getPosts.bind(this);
-    this.processPosts = this.processPosts.bind(this);
 
-    this.getPosts();
+    this.listPosts = this.listPosts.bind(this);
+    this.listPosts();
+
+    this.getPost = this.getPost.bind(this);
   }
 
-  getPosts() {
-    api.getFiles(this.processPosts);
-  }
-
-  processPosts(payload) {
-    this.setState({
-      posts: payload,
+  getPost(filename) {
+    api.getFile(filename, (payload) => {
+      const md = new Remarkable();
+      console.log(md.render(payload));
     });
+  }
+
+  listPosts() {
+    api.getFileNames((payload) => this.setState({
+      posts: payload,
+    }));
   }
 
   render() {
     return (
       <div>
         <Menu />
-        <PostList posts={this.state.posts} />
+        <PostList posts={this.state.posts} getPost={this.getPost} />
       </div>
     );
   }
