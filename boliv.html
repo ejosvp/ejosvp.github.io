@@ -1,0 +1,168 @@
+<style>
+    body {
+        font-family: sans-serif;
+        margin: 5em;
+    }
+
+    .seat-layout tr {
+        height: 2em;
+        user-select: none;
+    }
+
+    .seat-layout td {
+        padding: 0.5em;
+        border: 1px solid gray;
+        font-weight: bold;
+    }
+
+    td.blocked {
+        background-color: #ffd992;
+    }
+
+    td.selected {
+        background-color: #444444;
+        color: white;
+        cursor: pointer;
+    }
+
+    td.booked {
+        background-color: #cbcbcb;
+    }
+
+    td.empty {
+        background-color: white;
+        cursor: pointer;
+    }
+
+    button.btn {
+        margin: 2em 1em;
+        padding: 0.5em;
+    }
+
+</style>
+
+<div style="width: 800px;">
+    <div style="width: 350px; display: inline-block">
+        <table class="seat-layout">
+            <tr data-row="D">
+                <td data-col="1" class="empty">D1</td>
+                <td data-col="2" class="empty">D2</td>
+                <td data-col="3" class="empty">D3</td>
+                <td data-col="4" class="empty">D4</td>
+                <td data-col="5" class="empty">D5</td>
+                <td data-col="6" class="empty">D6</td>
+                <td data-col="7" class="empty">D7</td>
+                <td data-col="8" class="empty">D8</td>
+            </tr>
+            <tr data-row="C"></tr>
+            <tr></tr>
+            <tr data-row="B">
+                <td data-col="1" class="empty">B1</td>
+                <td data-col="2" class="empty">B2</td>
+                <td data-col="3" class="empty">B3</td>
+                <td data-col="4" class="empty">B4</td>
+                <td data-col="5" class="empty">B5</td>
+                <td data-col="6" class="empty">B6</td>
+                <td data-col="7" class="empty">B7</td>
+                <td data-col="8" class="empty">B8</td>
+            </tr>
+            <tr data-row="A">
+                <td data-col="1" class="empty">A1</td>
+                <td data-col="2" class="empty">A2</td>
+                <td data-col="3" class="empty">A3</td>
+                <td data-col="4" class="empty">A4</td>
+                <td data-col="5" class="empty">A5</td>
+                <td data-col="6" class="empty">A6</td>
+                <td data-col="7" class="empty">A7</td>
+                <td data-col="8" class="empty">A8</td>
+            </tr>
+        </table>
+
+        <button class="btn book">Book</button>
+        <button class="btn reset">Reset</button>
+        <button class="btn random">Random</button>
+    </div>
+    <div style="width: 350px; float: right">
+        <h2>log</h2>
+        <ul class="log"></ul>
+    </div>
+    <div style="clear: both"></div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+        crossorigin="anonymous"></script>
+
+<script>
+    $(function () {
+
+        let $log = $('.log')
+
+        $('td').on('click', function (e) {
+            let $td = $(e.target)
+
+            if ($td.is('.selected')) {
+                $td.removeClass('selected')
+                $td.addClass('empty')
+            } else if ($td.is('.empty') && $('.selected').length < 6) {
+                $td.removeClass('empty')
+                $td.addClass('selected')
+            }
+        })
+
+        $('.book').on('click', function () {
+            $('.selected').removeClass('selected').addClass('booked').each(function () {
+                if ($(this).parent().is('tr[data-row=A]')) {
+                    let col = $(this).attr('data-col');
+                    let $Btd = $('tr[data-row=B] td[data-col=' + col + ']')
+
+                    if ($Btd.is('.empty')) {
+                        $Btd.removeClass('empty')
+                        $Btd.addClass('blocked')
+
+                        $log.append(`<li>RULE 1: blocked B${col}, coz A${col} booked</li>`)
+                    }
+                } else if ($(this).parent().is('tr[data-row=B]')) {
+                    let col = $(this).attr('data-col');
+                    let $Atd = $('tr[data-row=A] td[data-col=' + col + ']')
+
+                    if ($Atd.is('.empty')) {
+                        $(this).removeClass('booked')
+                        $(this).addClass('blocked')
+
+                        $Atd.removeClass('empty')
+                        $Atd.addClass('booked')
+
+                        $log.append(`<li>RULE 2: flipped B${col} by A${col}</li>`)
+                        $log.append(`<li>RULE 1: blocked B${col}, coz A${col} booked</li>`)
+                    }
+                }
+            });
+        })
+
+        $('.reset').on('click', function () {
+            $('.seat-layout td').each(function () {
+                $(this).removeAttr('class')
+                $(this).addClass('empty')
+            })
+
+            $log.empty();
+        });
+
+        $('.random').on('click', function () {
+            $('.reset').trigger('click');
+
+            let n = 5;
+            $('.seat-layout td').each(function () {
+                if (Math.floor(Math.random() * 3) === 1 && n-- > 0) {
+                    $(this).removeAttr('class')
+                    $(this).addClass('selected')
+                }
+            })
+
+            $('.book').trigger('click');
+
+            $log.empty();
+        })
+
+    });
+</script>
